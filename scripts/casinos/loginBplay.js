@@ -1,4 +1,4 @@
-const { toTitleCase, toSentenceCase} = require('../../utils')
+const { toTitleCase, toSentenceCase,status} = require('../../utils')
 
 const loginBplay = async (page, playerData) => {
   const meses = [
@@ -39,6 +39,7 @@ const pageUrl = process.env.BPLAY_PBA_URL
 
 
   try {
+    
     //Entrar a pag de login
     await page.goto(pageUrl, { //Bplay
       waitUntil: 'domcontentloaded',
@@ -72,7 +73,7 @@ const pageUrl = process.env.BPLAY_PBA_URL
 
       await page.getByText('ya está registrado').waitFor({ state: 'visible', timeout: 10000 });
       console.log('jugador previamente afiliado');
-      return('Jugador previamente afiliado');
+      return(status.previamenteAfiliado);
 
     } catch (error) {/*Si no estaba previamente afiliado, no hace nada*/ }
 
@@ -103,7 +104,7 @@ const pageUrl = process.env.BPLAY_PBA_URL
 
       await page.getByText('ya está registrado').waitFor({ state: 'visible', timeout: 10000 });
       console.log('jugador previamente afiliado');
-      return('Jugador previamente afiliado');
+      return(status.previamenteAfiliado);
 
     } catch (error){}
     // --- SELECCIÓN DE PROVINCIA---
@@ -205,11 +206,11 @@ const pageUrl = process.env.BPLAY_PBA_URL
     await page.waitForTimeout(200);
     
     
-    console.log("OK") //FIN
-    return("OK")
+    console.log("OK") 
+    return(status.ok)
 
   } catch (error) {
-    throw error;
+    return(status.error(error))
   }
 }
 

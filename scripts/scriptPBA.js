@@ -24,6 +24,8 @@ const playerData = {
 };
 */
 
+
+
 const scriptPBA = async (playerData) => {
 
     //AGREGAR PROXY ANTES DE SUBIR A LA NUBE
