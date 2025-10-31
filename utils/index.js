@@ -1,5 +1,12 @@
 
 
+const status = {
+    ok: {message:"OK", success:true},
+    previamenteAfiliado: {message:"Jugador previamente afiliado", success:true},
+    error:(err) => ({message:"error", success:false, error:err})
+}
+
+
 const verifyData = (jsonData, requiredFields) => { //Si falta algun elemento devuelve el elemento
     for (const field of requiredFields) {
         if (!jsonData[field]) {
@@ -22,4 +29,4 @@ const toSentenceCase = (aWord) => {
 }
 
 
-module.exports = {verifyData, toTitleCase, toSentenceCase}
+module.exports = {verifyData, toTitleCase, toSentenceCase, status}

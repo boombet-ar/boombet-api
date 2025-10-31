@@ -39,7 +39,7 @@ const registerPBA = async (req, res) => {
     try {
         const responses = await scriptPBA(playerData)
 
-        const success = !!responses;
+        const success = !!responses; // aca debe estar el error
 
         const webhookPayload = {
             playerData,
