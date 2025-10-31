@@ -1,7 +1,7 @@
 const { verifyData } = require('../utils')
 const sendWebhook = require('../utils/sendWebhook')
 const scriptPBA = require('../scripts/scriptPBA')
-const n8nWebhookUrl = 'http://localhost:5678/webhook-test/c9018e16-04a8-4136-835e-c1b7a3b46b53' //PASAR A .env
+const n8nWebhookUrl = process.env.WEBHOOK_URL //PASAR A .env
 
 const registerPBA = async (req, res) => {
     const playerData = req.body
@@ -39,7 +39,7 @@ const registerPBA = async (req, res) => {
     try {
         const responses = await scriptPBA(playerData)
 
-        const success = !!responses;
+        const success = !!responses; // aca debe estar el error
 
         const webhookPayload = {
             playerData,

@@ -1,4 +1,5 @@
-const { toTitleCase, toSentenceCase } = require('../../utils')
+const { toTitleCase, toSentenceCase, status } = require('../../utils')
+
 const Captcha = require('@2captcha/captcha-solver')
 require('dotenv').config({ quiet: true });
 
@@ -24,7 +25,7 @@ const loginSportsbet = async (page, playerData) => {
     try {
         await page.goto(pageUrl, {
             waitUntil: 'domcontentloaded',
-            timeout: 30000,
+            timeout: 35000,
         });
 
         await page.locator('#documentNumber').fill(dni);
@@ -51,12 +52,13 @@ const loginSportsbet = async (page, playerData) => {
 
         const res = await solver.recaptcha({
             pageurl: pageUrl,
-            googlekey: '6LfxRP4kAAAAAMl9eIBuLj9fxXCS7dICmuTZFmBp'
+            googlekey: '6LfxRP4kAAAAAMl9eIBuLj9fxXCS7dICmuTZFmBp' //ES EL 'ID' DEL CAPTCHA
         });
 
         const captchaToken = res.data;
         if (!captchaToken) {
-            throw new Error('No se pudo obtener el token de 2captcha.');
+        const err = 'No se pudo obtener el token de 2captcha.'
+        return(status.error(err))
         }
 
 
@@ -79,23 +81,24 @@ const loginSportsbet = async (page, playerData) => {
             await errorMessage.waitFor({ state: 'visible', timeout: 10000 });
 
             console.log('Error al afiliar: Verificar DNI y género');
-            return "Verificar DNI y género";
+            const err = "Verificar DNI y género";
+            return(status.error(err))
         } catch { }
 
         try {
 
             await page.getByText('Ya existe').waitFor({ state: 'visible', timeout: 10000 });
             console.log('Jugador previamente afiliado');
-            return ("Jugador previamente afiliado");
+            return (status.previamenteAfiliado);
 
         } catch (error) {/*Si no estaba previamente afiliado, no hace nada*/ }
 
 
         console.log("OK")
-        return ("OK")
+        return (status.ok)
     } catch (error) {
-        console.error('❌ Error: ', error);
-        return (error)
+        console.log('❌ Error: ', error);
+        return(status.error(error.message))
     }
 
 }
