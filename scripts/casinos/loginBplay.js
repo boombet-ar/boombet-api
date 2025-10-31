@@ -210,7 +210,7 @@ const pageUrl = process.env.BPLAY_PBA_URL
     return(status.ok)
 
   } catch (error) {
-    return(status.error(error))
+    return(status.error(error.message))
   }
 }
 

@@ -25,7 +25,7 @@ const loginSportsbet = async (page, playerData) => {
     try {
         await page.goto(pageUrl, {
             waitUntil: 'domcontentloaded',
-            timeout: 30000,
+            timeout: 35000,
         });
 
         await page.locator('#documentNumber').fill(dni);
@@ -98,7 +98,7 @@ const loginSportsbet = async (page, playerData) => {
         return (status.ok)
     } catch (error) {
         console.log('❌ Error: ', error);
-        return(status.error(error))
+        return(status.error(error.message))
     }
 
 }
