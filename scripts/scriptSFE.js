@@ -7,7 +7,7 @@ require('dotenv').config({ quiet: true });
 const scriptSFE = async (playerData) => {
 
     const browser = await chromium.launch({
-        headless: false, // Cambia a false si querés ver el navegador. En n8n, dejar en true
+        headless: true, // Cambia a false si querés ver el navegador. En n8n, dejar en true
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
