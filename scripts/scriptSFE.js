@@ -11,12 +11,12 @@ const scriptSFE = async (playerData) => {
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
-    const context = await browser.newContext({/*  SACAR PROXY EN DESARROLLO
+    const context = await browser.newContext({
         proxy: { 
         server: process.env.PROXY_IPROYAL_SERVER,   
         username: process.env.PROXY_IPROYAL_USERNAME,
         password: process.env.PROXY_IPROYAL_PASSWORD
-      },*/
+      },
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36', 
     });
 
