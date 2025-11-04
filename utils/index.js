@@ -7,12 +7,14 @@ const status = {
 }
 
 
-const verifyData = (jsonData, requiredFields) => { //Si falta algun elemento devuelve el elemento
+const verifyData = (jsonData, requiredFields) => { //devuelve lista con elementos faltantes
+    const missingFields = []
     for (const field of requiredFields) {
         if (!jsonData[field]) {
-            return field;
+          missingFields.push(field)
         }
-    }
+      }
+      return missingFields;
   }
 
 function toTitleCase(str) {

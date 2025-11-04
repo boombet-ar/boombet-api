@@ -9,7 +9,7 @@ const solver = new Captcha.Solver(captchaApiKey)
 
 const pageUrl = process.env.SPORTSBET_PBA_URL
 
-const loginSportsbet = async (page, playerData) => {
+const sportsbetPba = async (page, playerData) => {
     const {
         email,
         genero,
@@ -103,4 +103,4 @@ const loginSportsbet = async (page, playerData) => {
 
 }
 
-module.exports = loginSportsbet
+module.exports = sportsbetPba

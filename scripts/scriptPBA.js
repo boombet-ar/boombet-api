@@ -1,6 +1,6 @@
 const { chromium } = require('playwright');
-const loginBplay = require('./casinos/loginBplay')
-const loginSportsbet = require('./casinos/loginSportsbet')
+const bplayPba = require('./pba/bplayPba')
+const sportsbetPba = require('./pba/sportsbetPba')
 require('dotenv').config({ quiet: true });
 
 /* DATOS DE EJEMPLO:
@@ -28,7 +28,6 @@ const playerData = {
 
 const scriptPBA = async (playerData) => {
 
-    //AGREGAR PROXY ANTES DE SUBIR A LA NUBE
     const browser = await chromium.launch({
         headless: true, // Cambia a false si querés ver el navegador. En n8n, dejar en true
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -50,8 +49,8 @@ const scriptPBA = async (playerData) => {
     try {
         
         const promises = [
-            loginBplay(pageBplay, playerData), // <--- playerData llega desde una request http
-            loginSportsbet(pageSportsbet, playerData)
+            bplayPba(pageBplay, playerData), // <--- playerData llega desde una request http
+            sportsbetPba(pageSportsbet, playerData)
             //ACA SE AGREGAN MAS CASINOS
         ]
 

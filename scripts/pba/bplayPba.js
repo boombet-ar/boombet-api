@@ -1,6 +1,6 @@
 const { toTitleCase, toSentenceCase,status} = require('../../utils')
 
-const loginBplay = async (page, playerData) => {
+const bplayPba = async (page, playerData) => {
   const meses = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -214,4 +214,4 @@ const pageUrl = process.env.BPLAY_PBA_URL
   }
 }
 
-module.exports = loginBplay;
+module.exports = bplayPba;
