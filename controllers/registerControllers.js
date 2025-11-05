@@ -1,13 +1,10 @@
 const { chromium } = require('playwright');
 const { verifyData } = require('../utils')
 const sendWebhook = require('../utils/sendWebhook')
-const scriptPBA = require('../scripts/scriptPBA')
-const scriptCABA = require('../scripts/scriptCABA')
-const scriptCBA = require('../scripts/scriptCBA')
-const scriptSFE = require('../scripts/scriptSFE')
+
+const executeScripts = require('../scripts/mainScript');
 const n8nWebhookUrl = process.env.WEBHOOK_URL
-
-
+const scriptsList = require('../utils/provinceLists')
 
 const requiredFields = [
     'nombre',
@@ -45,7 +42,7 @@ const registerCasino = async (req, res) => {
     }
 
     const browser = await chromium.launch({
-        headless: true, // Cambia a false si querés ver el navegador. En n8n, dejar en true
+        headless: false, // Cambia a false si querés ver el navegador. En n8n, dejar en true
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
@@ -83,8 +80,11 @@ const registerCasino = async (req, res) => {
 
 
 
-const registerCABA = async (req, res) => { //Casinos de caba
+const registerProvincia = async (req, res) => {
     const playerData = req.body
+    const provincia = req.params.provincia
+
+    const provinceScripts = scriptsList[provincia]
 
     const missingFields = verifyData(playerData, requiredFields)
     if (missingFields.length > 0) {
@@ -93,14 +93,12 @@ const registerCABA = async (req, res) => { //Casinos de caba
             message: `Faltan datos: ${missingFields}`
         });
     }
-    // esta verificación hay que hacerla, pero habria que investigar como hacerla
-    //sin tener que pasarle 200 elementos al array. por ahora sirve
 
 
     try {
-        const responses = await scriptCABA(playerData)
+        const responses = await executeScripts(provinceScripts, playerData)
 
-        const success = !!responses; // aca debe estar el error
+        const success = !!responses; 
 
         const webhookPayload = {
             playerData,
@@ -125,126 +123,5 @@ const registerCABA = async (req, res) => { //Casinos de caba
 
 
 
-const registerPBA = async (req, res) => {
-    const playerData = req.body
 
-    const missingFields = verifyData(playerData, requiredFields)
-    if (missingFields.length > 0) {
-        res.status(400).json({
-            success: "false",
-            message: `Faltan datos: ${missingFields}`
-        });
-    }
-    // esta verificación hay que hacerla, pero habria que investigar como hacerla
-    //sin tener que pasarle 200 elementos al array. por ahora sirve
-
-
-    try {
-        const responses = await scriptPBA(playerData)
-
-        const success = !!responses; // aca debe estar el error
-
-        const webhookPayload = {
-            playerData,
-            responses
-        }
-
-        if (success) {
-            sendWebhook(n8nWebhookUrl, webhookPayload)
-                .catch(err => {
-                    console.error(`El webhook para ${playerData.dni} falló.`, err.message);
-                });
-        }
-
-        return res.status(200).json({
-            playerData,
-            success,
-            responses
-        })
-
-    } catch (err) { return res.status(500).json({ success: false, message: `Error al ejecutar script:${err.message}` }) }
-}
-
-
-
-const registerCBA = async (req, res) => { //Casinos de cordoba
-    const playerData = req.body
-
-    const missingFields = verifyData(playerData, requiredFields)
-    if (missingFields.length > 0) {
-        res.status(400).json({
-            success: "false",
-            message: `Faltan datos: ${missingFields}`
-        });
-    }
-    // esta verificación hay que hacerla, pero habria que investigar como hacerla
-    //sin tener que pasarle 200 elementos al array. por ahora sirve
-
-
-    try {
-        const responses = await scriptCBA(playerData)
-
-        const success = !!responses; // aca debe estar el error
-
-        const webhookPayload = {
-            playerData,
-            responses
-        }
-
-        if (success) {
-            sendWebhook(n8nWebhookUrl, webhookPayload)
-                .catch(err => {
-                    console.error(`El webhook para ${playerData.dni} falló.`, err.message);
-                });
-        }
-
-        return res.status(200).json({
-            playerData,
-            success,
-            responses
-        })
-
-    } catch (err) { return res.status(500).json({ success: false, message: `Error al ejecutar script:${err.message}` }) }
-}
-
-const registerSFE = async (req, res) => { //Casinos de santa fe
-    const playerData = req.body
-
-    const missingFields = verifyData(playerData, requiredFields)
-    if (missingFields.length > 0) {
-        res.status(400).json({
-            success: "false",
-            message: `Faltan datos: ${missingFields}`
-        });
-    }
-    // esta verificación hay que hacerla, pero habria que investigar como hacerla
-    //sin tener que pasarle 200 elementos al array. por ahora sirve
-
-
-    try {
-        const responses = await scriptSFE(playerData)
-
-        const success = !!responses; // aca debe estar el error
-
-        const webhookPayload = {
-            playerData,
-            responses
-        }
-
-        if (success) {
-            sendWebhook(n8nWebhookUrl, webhookPayload)
-                .catch(err => {
-                    console.error(`El webhook para ${playerData.dni} falló.`, err.message);
-                });
-        }
-
-        return res.status(200).json({
-            playerData,
-            success,
-            responses
-        })
-
-    } catch (err) { return res.status(500).json({ success: false, message: `Error al ejecutar script:${err.message}` }) }
-}
-
-module.exports = { registerCasino, registerPBA, registerCABA, registerCBA, registerSFE}
+module.exports = { registerCasino, registerProvincia}
