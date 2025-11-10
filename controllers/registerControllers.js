@@ -2,8 +2,9 @@ const { chromium } = require('playwright');
 const { verifyData } = require('../utils')
 const sendWebhook = require('../utils/sendWebhook')
 
-const executeScripts = require('../scripts/mainScript');
+const executeScripts = require('../scripts/executeScripts');
 const n8nWebhookUrl = process.env.WEBHOOK_URL
+const afWebhook = process.env.AF_WEBHOOK
 const scriptsList = require('../utils/provinceLists')
 
 const requiredFields = [
@@ -42,7 +43,7 @@ const registerCasino = async (req, res) => {
     }
 
     const browser = await chromium.launch({
-        headless: false, // Cambia a false si querés ver el navegador. En n8n, dejar en true
+        headless: true, // Cambia a false si querés ver el navegador. En n8n, dejar en true
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
@@ -56,7 +57,7 @@ const registerCasino = async (req, res) => {
     });
 
     const page = await context.newPage();
-    
+
     try {
         const responses = await scriptCasino(page, playerData)
 
@@ -76,19 +77,21 @@ const registerCasino = async (req, res) => {
         })
 
     } catch (err) { return res.status(500).json({ success: false, message: `Error al ejecutar script:${err.message}` }) }
+    finally { await browser.close() }
 }
 
 
 
 const registerProvincia = async (req, res) => {
     const playerData = req.body
-    const provincia = req.params.provincia
+    const { provincia, tokenAfiliador } = req.params
 
     const provinceScripts = scriptsList[provincia]
 
+
     const missingFields = verifyData(playerData, requiredFields)
     if (missingFields.length > 0) {
-        res.status(400).json({
+        return res.status(400).json({
             success: "false",
             message: `Faltan datos: ${missingFields}`
         });
@@ -98,7 +101,7 @@ const registerProvincia = async (req, res) => {
     try {
         const responses = await executeScripts(provinceScripts, playerData)
 
-        const success = !!responses; 
+        const success = !!responses;
 
         const webhookPayload = {
             playerData,
@@ -112,10 +115,30 @@ const registerProvincia = async (req, res) => {
                 });
         }
 
+
+        if (tokenAfiliador) {
+            const someoneIsOK = Object.values(responses).some(response => response.message === "OK") 
+            if (someoneIsOK) {
+
+
+                afPayload = { success: true, token: tokenAfiliador, playerData }
+
+                sendWebhook(afWebhook, afPayload) 
+                    .catch(err => {
+                        console.error(`El webhook para ${tokenAfiliador} falló.`, err.message);
+
+                    });
+
+            }
+        }
+
+
+
         return res.status(200).json({
             playerData,
             success,
-            responses
+            responses,
+            tokenAfiliador
         })
 
     } catch (err) { return res.status(500).json({ success: false, message: `Error al ejecutar script:${err.message}` }) }
@@ -124,4 +147,4 @@ const registerProvincia = async (req, res) => {
 
 
 
-module.exports = { registerCasino, registerProvincia}
+module.exports = { registerCasino, registerProvincia }
