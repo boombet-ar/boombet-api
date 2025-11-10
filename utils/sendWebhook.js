@@ -1,5 +1,5 @@
 
-// Cambié el nombre a algo más descriptivo
+
 async function sendWebhook(webhookURL, payload) {
     try {
         const response = await fetch(webhookURL, {

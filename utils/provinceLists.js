@@ -1,5 +1,5 @@
 //Aca se importan y se crean las listas con los casinos
-
+//Esto quizá deberia estar en './scripts'.
 //CABA 
 const bplayCaba = require('../scripts/caba/bplayCaba');
 
@@ -13,11 +13,14 @@ const bplayCba = require('../scripts/cba/bplayCba')
 //SFE
 const bplaySfe = require('../scripts/sfe/bplaySfe')
 
-const scriptsList = {
+const provinceLists = {
   caba: [bplayCaba],
+
   pba:[sportsbetPba, bplayPba],
+
   cba:[bplayCba],
+
   sfe:[bplaySfe]
 };
 
-module.exports=scriptsList
+module.exports=provinceLists
