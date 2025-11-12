@@ -1,6 +1,7 @@
 //Aca se importan y se crean las listas con los casinos
 //Esto quizá deberia estar en './scripts'.
 //CABA 
+/*
 const bplayCaba = require('../scripts/caba/bplayCaba');
 
 //PBA
@@ -12,15 +13,15 @@ const bplayCba = require('../scripts/cba/bplayCba')
 
 //SFE
 const bplaySfe = require('../scripts/sfe/bplaySfe')
-
+*/
 const provinceLists = {
-  caba: [bplayCaba],
+  caba: ['bplayCaba'],
 
-  pba:[sportsbetPba, bplayPba],
+  pba:['sportsbetPba', 'bplayPba'],
 
-  cba:[bplayCba],
+  cba:['bplayCba'],
 
-  sfe:[bplaySfe]
+  sfe:['bplaySfe']
 };
 
 module.exports=provinceLists
