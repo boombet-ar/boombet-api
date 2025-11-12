@@ -105,42 +105,41 @@ const registerProvincia = async (req, res) => {
 
     try {
 
-        console.log(afWebhook)
-        console.log(n8nWebhookUrl)
         const scriptPath = './scripts/executeScripts.js'
         const responses = await limit(() =>
             executeScriptsInFork(scriptsDir, playerData, scriptPath)
         );
 
         const success = !!responses;
+
         const webhookPayload = {
             playerData,
             responses
         }
+
+        /* 
+        "playerData": {},
+        "responses":{
+            "bplay": {}
+                },
+        "afPayload":{
+            "success":true,
+            "token": "a34ns82n38sn82na82",
+        }   
+        */
+        if (tokenAfiliador) {
+            const someoneIsOK = Object.values(responses).some(response => response.message === "OK")
+            if (someoneIsOK) {
+                webhookPayload.afPayload = { success: true, token: tokenAfiliador };
+            }
+        }
+
 
         if (success) {
             sendWebhook(n8nWebhookUrl, webhookPayload)
                 .catch(err => {
                     console.error(`El webhook para ${playerData.dni} falló.`, err.message);
                 });
-        }
-
-
-
-        if (tokenAfiliador) {
-            const someoneIsOK = Object.values(responses).some(response => response.message === "OK")
-            if (someoneIsOK) {
-
-
-                afPayload = { success: true, token: tokenAfiliador, playerData }
-
-                sendWebhook(afWebhook, afPayload)
-                    .catch(err => {
-                        console.error(`El webhook para ${tokenAfiliador} falló.`, err.message);
-
-                    });
-
-            }
         }
 
 
