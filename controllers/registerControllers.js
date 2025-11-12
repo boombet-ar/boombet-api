@@ -1,13 +1,13 @@
 const { chromium } = require('playwright');
 const { verifyData } = require('../utils')
 const sendWebhook = require('../utils/sendWebhook')
-
-const executeScripts = require('../scripts/executeScripts');
+const limit = require('../utils/processQueue')
+//const executeScripts = require('../scripts/executeScripts');
 const n8nWebhookUrl = process.env.WEBHOOK_URL
 const afWebhook = process.env.AF_WEBHOOK
 const scriptsList = require('../utils/provinceLists')
 
-const {fork} = require('node:child_process')
+const { fork } = require('node:child_process')
 
 const requiredFields = [
     'nombre',
@@ -92,7 +92,7 @@ const registerProvincia = async (req, res) => {
 
 
     const scriptsDir = provinceScripts.map(script => `../scripts/${provincia}/${script}`)
-    
+
 
     const missingFields = verifyData(playerData, requiredFields)
     if (missingFields.length > 0) {
@@ -105,11 +105,14 @@ const registerProvincia = async (req, res) => {
 
     try {
 
+        console.log(afWebhook)
+        console.log(n8nWebhookUrl)
         const scriptPath = './scripts/executeScripts.js'
-        const responses = await executeScriptsInFork(scriptsDir, playerData, scriptPath)
+        const responses = await limit(() =>
+            executeScriptsInFork(scriptsDir, playerData, scriptPath)
+        );
 
         const success = !!responses;
-
         const webhookPayload = {
             playerData,
             responses
@@ -123,14 +126,15 @@ const registerProvincia = async (req, res) => {
         }
 
 
+
         if (tokenAfiliador) {
-            const someoneIsOK = Object.values(responses).some(response => response.message === "OK") 
+            const someoneIsOK = Object.values(responses).some(response => response.message === "OK")
             if (someoneIsOK) {
 
 
                 afPayload = { success: true, token: tokenAfiliador, playerData }
 
-                sendWebhook(afWebhook, afPayload) 
+                sendWebhook(afWebhook, afPayload)
                     .catch(err => {
                         console.error(`El webhook para ${tokenAfiliador} falló.`, err.message);
 
@@ -138,7 +142,6 @@ const registerProvincia = async (req, res) => {
 
             }
         }
-
 
 
         return res.status(200).json({
@@ -156,11 +159,11 @@ const registerProvincia = async (req, res) => {
 
 const executeScriptsInFork = (scripts, playerData, modulePath) => {
     return new Promise((resolve, reject) => {
-        
-        
-        const child = fork(modulePath); 
 
-        child.on('message', (message) => { 
+
+        const child = fork(modulePath);
+
+        child.on('message', (message) => {
             if (message.type === 'success') {
                 resolve(message.payload);
             } else if (message.type === 'error') {
@@ -171,15 +174,15 @@ const executeScriptsInFork = (scripts, playerData, modulePath) => {
         child.on('error', (err) => {
             reject(new Error(`Error al generar el proceso hijo: ${err.message}`));
         });
-        
-        child.on('exit', (code, signal) => { 
+
+        child.on('exit', (code, signal) => {
             if (code !== 0 && signal !== 'SIGTERM' && child.connected) {
                 reject(new Error(`Proceso hijo terminado inesperadamente. Código: ${code}, Señal: ${signal}`));
             }
         });
 
-        
-        child.send({ scripts, playerData }); 
+
+        child.send({ scripts, playerData });
     });
 };
 
