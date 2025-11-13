@@ -4,8 +4,14 @@ require('dotenv').config({ quiet: true });
 
 
 
+//CONCURRENCIA: Usar child_process, send() ,on(), fork() etc
 
-const executeScripts = async (scripts, playerData) => { // array con scripts de una provincia y playerData
+
+
+//executescripts deberia ser el proceso forkeado. el controller deberia ser el padre
+
+
+const executeScripts = async (scripts, playerData) => { // array con rutas de scripts de una provincia y playerData
 
     const browser = await chromium.launch({
         headless: true, // Cambia a false si querés ver el navegador. En n8n, dejar en true
@@ -49,6 +55,28 @@ const executeScripts = async (scripts, playerData) => { // array con scripts de 
         await browser.close();
     }
 };
+
+process.on('message', async (message) => {
+    const { scripts, playerData } = message
+    
+    const functions = scripts.map(s => {
+        return require(s)
+    })
+
+
+    try {
+        const responses = await executeScripts(functions, playerData);
+
+        process.send({ type: 'success', payload: responses }); 
+
+    } catch (error) {
+        console.error('Error en el proceso hijo al ejecutar Playwright:', error);
+        process.send({ type: 'error', payload: error.message || 'Error desconocido' });
+
+    } finally {
+        process.disconnect();
+    }
+});
 
 
 module.exports = executeScripts
