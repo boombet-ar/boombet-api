@@ -23,6 +23,26 @@ const sportsbetPba = async (page, playerData) => {
     const numero = telefono.slice(2);
 
     try {
+
+
+        //Optimizacion de recursos: no descarga multimedia
+        await page.route('**/*', (route) => {
+            const resourceType = route.request().resourceType();
+            const url = route.request().url();
+
+            if (
+                ['image', 'font', 'media'].includes(resourceType) ||
+                url.includes('google-analytics.com') ||
+                url.includes('googletagmanager.com')
+            ) {
+                return route.abort();
+            }
+            
+            return route.continue();
+        });
+
+
+
         await page.goto(pageUrl, {
             waitUntil: 'domcontentloaded',
             timeout: 35000,
@@ -45,7 +65,7 @@ const sportsbetPba = async (page, playerData) => {
         await page.locator('#ConfirmPassword').fill(password)
 
 
-        await page.locator('[onclick="togglePassword(\'Password\')"]').click();
+        //await page.locator('[onclick="togglePassword(\'Password\')"]').click();
 
         await page.locator('.checkmark').click()
 
@@ -78,7 +98,7 @@ const sportsbetPba = async (page, playerData) => {
 
         try {
             const errorMessage = await page.locator('span', { hasText: 'No pudimos validar tus datos' });
-            await errorMessage.waitFor({ state: 'visible', timeout: 10000 });
+            await errorMessage.waitFor({ state: 'visible', timeout: 8000 });
 
             console.log('Error al afiliar: Verificar DNI y género');
             const err = "Verificar DNI y género";
@@ -87,7 +107,7 @@ const sportsbetPba = async (page, playerData) => {
 
         try {
 
-            await page.getByText('Ya existe').waitFor({ state: 'visible', timeout: 10000 });
+            await page.getByText('Ya existe').waitFor({ state: 'visible', timeout: 8000 });
             console.log('Jugador previamente afiliado');
             return (status.previamenteAfiliado);
 

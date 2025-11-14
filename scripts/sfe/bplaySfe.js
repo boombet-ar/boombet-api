@@ -43,6 +43,22 @@ const bplaySfe = async (page, playerData) => {
 
     try {
 
+        await page.route('**/*', (route) => {
+            const resourceType = route.request().resourceType();
+            const url = route.request().url();
+
+            if (
+                ['image', 'font', 'media'].includes(resourceType) ||
+                url.includes('google-analytics.com') ||
+                url.includes('googletagmanager.com')
+            ) {
+                return route.abort();
+            }
+            
+            return route.continue();
+        });
+
+
         //Entrar a pag de login
         await page.goto(pageUrl, { //Bplay
             waitUntil: 'domcontentloaded',
