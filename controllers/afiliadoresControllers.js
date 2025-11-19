@@ -4,6 +4,7 @@ const db = require('../config/db')
 
 
 const getAfiliadores = async (req, res) => {
+    //AGREGAR PAGINACION
     try {
         const rawResult = await db.query('SELECT * FROM afiliadores;')
         const result = rawResult.rows.filter(o => o.estado === 'Listo') //Solo devuelve los que ya hicieron la confirmacion desde telegram
@@ -41,6 +42,8 @@ const deleteAfiliador = async(req,res) =>{
 
 }
 
+
+
 const afAdminLogin = async (req,res) => {
     let isAdmin;
 
@@ -51,7 +54,7 @@ const afAdminLogin = async (req,res) => {
         isAdmin = true;
         return res.status(200).json({message:'Ingreso exitoso'})
     }else{
-        return res.status(401).json({message:'Error'})
+        return res.status(401).json({message:'Credenciales incorrectas'})
     }
 }
 
