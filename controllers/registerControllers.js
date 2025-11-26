@@ -118,7 +118,8 @@ const registerProvincia = async (req, res) => {
 
         const webhookPayload = {
             playerData,
-            responses
+            responses,
+            websocketLink
         }
 
         /* 
