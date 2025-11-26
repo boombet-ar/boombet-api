@@ -85,11 +85,15 @@ const registerCasino = async (req, res) => {
 
 
 const registerProvincia = async (req, res) => {
-    const playerData = req.body
+
+   
+
+    const {playerData, websocketLink} = req.body //agregar link del websocket a la respuesta
     const { provincia, tokenAfiliador } = req.params
 
     const provinceScripts = scriptsList[provincia]
 
+    
 
     const scriptsDir = provinceScripts.map(script => `../scripts/${provincia}/${script}`)
 
@@ -147,7 +151,8 @@ const registerProvincia = async (req, res) => {
             playerData,
             success,
             responses,
-            tokenAfiliador
+            tokenAfiliador,
+            websocketLink
         })
 
     } catch (err) { return res.status(500).json({ success: false, message: `Error al ejecutar script:${err.message}` }) }
@@ -188,3 +193,11 @@ const executeScriptsInFork = (scripts, playerData, modulePath) => {
 
 
 module.exports = { registerCasino, registerProvincia }
+
+
+
+
+
+
+
+
