@@ -88,7 +88,7 @@ const registerProvincia = async (req, res) => {
 
    
 
-    const {playerData, websocketLink} = req.body //agregar link del websocket a la respuesta
+    const playerData = req.body 
     const { provincia, tokenAfiliador } = req.params
 
     const provinceScripts = scriptsList[provincia]
@@ -118,8 +118,7 @@ const registerProvincia = async (req, res) => {
 
         const webhookPayload = {
             playerData,
-            responses,
-            websocketLink
+            responses
         }
 
         /* 
@@ -152,8 +151,7 @@ const registerProvincia = async (req, res) => {
             playerData,
             success,
             responses,
-            tokenAfiliador,
-            websocketLink
+            tokenAfiliador
         })
 
     } catch (err) { return res.status(500).json({ success: false, message: `Error al ejecutar script:${err.message}` }) }
