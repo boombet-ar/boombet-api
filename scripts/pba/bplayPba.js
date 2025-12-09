@@ -222,7 +222,7 @@ const pageUrl = process.env.BPLAY_PBA_URL
     
     
     console.log("OK") 
-    return(status.ok)
+    return(status.ok("https://pba.bplay.bet.ar/?login=true"))
 
   } catch (error) {
     return(status.error(error.message))

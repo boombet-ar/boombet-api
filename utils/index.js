@@ -1,7 +1,7 @@
 
 
 const status = {
-    ok: {message:"OK", success:true},
+    ok: (url) => ({ message: "OK", success: true, casinoUrl: url }),
     previamenteAfiliado: {message:"Jugador previamente afiliado", success:true},
     error:(err) => ({message:"error", success:false, error:err})
 }

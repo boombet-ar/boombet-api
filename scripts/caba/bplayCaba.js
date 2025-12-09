@@ -241,7 +241,7 @@ const bplayCaba = async (page, playerData) => {
     
     
     console.log("OK") 
-    return(status.ok)
+    return(status.ok("https://caba.bplay.bet.ar/"))
 
   } catch (error) {
     return(status.error(error.message))

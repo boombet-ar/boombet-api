@@ -115,7 +115,7 @@ const sportsbetPba = async (page, playerData) => {
 
 
         console.log("OK")
-        return (status.ok)
+        return (status.ok("https://pba.sportsbet.bet.ar/"))
     } catch (error) {
         console.log('❌ Error: ', error);
         return(status.error(error.message))

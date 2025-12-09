@@ -177,7 +177,7 @@ const bplaySfe = async (page, playerData) => {
         await page.waitForTimeout(30000)
 
         console.log("OK")
-        return (status.ok)
+        return (status.ok("https://santafe.bplay.bet.ar/?login=true"))
 
     } catch (error) {
         return (status.error(error.message))
