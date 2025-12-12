@@ -50,12 +50,13 @@ const registerCasino = async (req, res) => {
     });
 
     const context = await browser.newContext({
+        
         proxy: {
             server: process.env.PROXY_IPROYAL_SERVER,
             username: process.env.PROXY_IPROYAL_USERNAME,
             password: process.env.PROXY_IPROYAL_PASSWORD
         },
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
     });
 
     const page = await context.newPage();
