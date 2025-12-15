@@ -74,9 +74,19 @@ const sportsbetPba = async (page, playerData) => {
         await page.locator('#Password').fill(password);
         await page.locator('#ConfirmPassword').fill(password);
 
+        const checkAffiliate = async() => {
+        if (await page.getByText("Ya existe")) {
+            console.log(status.previamenteAfiliado)
+            return status.previamenteAfiliado
+        }} 
+
+        
+
+
         // Click en términos y condiciones
         await page.locator('.checkmark').click();
 
+        checkAffiliate();
         // =============================================================================
         // PASO 1 y 2 (DOCS): SOLICITUD A 2CAPTCHA
         // =============================================================================
@@ -200,13 +210,14 @@ const sportsbetPba = async (page, playerData) => {
         } catch (e) { }
 
         // Comprobación de errores en pantalla
-        if (await page.getByText('Atención').isVisible()) {
+        if (await page.getByText('Error').isVisible() || await page.getByText('Problema').isVisible()) {
             console.log("❌ Error 'Atención' detectado en el sitio.");
             await page.waitForTimeout(5000);
             return status.error("Error al afiliar. Revisa los datos");
         }
 
-        
+        checkAffiliate();
+
         // Ajusta esta lógica según la URL de éxito real
         if (await page.getByText("Ya existe")) {
             console.log(status.previamenteAfiliado)
