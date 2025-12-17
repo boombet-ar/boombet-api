@@ -45,7 +45,7 @@ const registerCasino = async (req, res) => {
     }
 
     const browser = await chromium.launch({
-        headless: true, // Cambia a false si querés ver el navegador. En n8n, dejar en true
+        headless: true, // Cambia a false si querés ver el navegador. En produccion, dejar en true
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
@@ -71,7 +71,12 @@ const registerCasino = async (req, res) => {
             responses
         }
 
-        //No envia webhook
+        if (success) {
+            sendWebhook(n8nWebhookUrl, webhookPayload)
+                .catch(err => {
+                    console.error(`El webhook para ${playerData.dni} falló.`, err.message);
+                });
+        }
 
         return res.status(200).json({
             playerData,
