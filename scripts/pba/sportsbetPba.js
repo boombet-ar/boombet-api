@@ -29,6 +29,9 @@ const sportsbetPba = async (page, playerData) => {
     const codArea = telefono.slice(0, 2);
     const numero = telefono.slice(2);
 
+
+    console.log(playerData);
+    
     try {
 
         // 1. OBTENER USER-AGENT REAL (CRÍTICO PARA TURNSTILE)
