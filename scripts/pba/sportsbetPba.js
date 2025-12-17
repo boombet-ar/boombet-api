@@ -31,7 +31,7 @@ const sportsbetPba = async (page, playerData) => {
 
 
     console.log(playerData);
-    
+
     try {
 
         // 1. OBTENER USER-AGENT REAL (CRÍTICO PARA TURNSTILE)
@@ -244,7 +244,7 @@ const sportsbetPba = async (page, playerData) => {
                 console.log("⚠️ No se pudo verificar afiliación final (contexto cerrado): " + err.message);
             }
 
-            await page.waitForTimeout()
+            await page.waitForTimeout(1000)
             // Si sobrevivió a todo lo anterior y no hay errores:
             return status.ok("https://pba.sportsbet.bet.ar/");
 
