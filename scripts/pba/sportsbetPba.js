@@ -241,6 +241,7 @@ const sportsbetPba = async (page, playerData) => {
                 console.log("⚠️ No se pudo verificar afiliación final (contexto cerrado): " + err.message);
             }
 
+            await page.waitForTimeout(())
             // Si sobrevivió a todo lo anterior y no hay errores:
             return status.ok("https://pba.sportsbet.bet.ar/");
 

@@ -45,7 +45,7 @@ const registerCasino = async (req, res) => {
     }
 
     const browser = await chromium.launch({
-        headless: false, // Cambia a false si querés ver el navegador. En n8n, dejar en true
+        headless: true, // Cambia a false si querés ver el navegador. En n8n, dejar en true
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
