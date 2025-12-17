@@ -75,10 +75,12 @@ const sportsbetPba = async (page, playerData) => {
         await page.locator('#ConfirmPassword').fill(password);
 
         const checkAffiliate = async() => {
-        if (await page.getByText("Ya existe")) {
+        if (await page.getByText("Ya existe").isVisible()) {
             console.log(status.previamenteAfiliado)
             return status.previamenteAfiliado
-        }} 
+        }else if (await page.getByText("Atención").isVisible()) {
+            return status.error("Error en datos o al ejecutar")
+        } }
 
         
 
@@ -203,33 +205,58 @@ const sportsbetPba = async (page, playerData) => {
                 }
             });
         }
-
+        checkAffiliate();
         // ESPERA DE RESULTADO
         try {
             await page.waitForTimeout(5000);
         } catch (e) { }
 
-        // Comprobación de errores en pantalla
-        if (await page.getByText('Error').isVisible() || await page.getByText('Problema').isVisible()) {
-            console.log("❌ Error 'Atención' detectado en el sitio.");
-            await page.waitForTimeout(5000);
-            return status.error("Error al afiliar. Revisa los datos");
+        // --- INICIO DE BLOQUE PROTEGIDO ---
+        try {
+            // 1. Verificamos si el navegador sigue vivo antes de consultar nada
+            if (page.isClosed()) {
+                console.log("⚠️ El navegador se cerró inesperadamente.");
+                // Si se cerró justo después del submit, a veces es éxito, a veces no. 
+                // Ante la duda, devolvemos error o un estado especial.
+                return status.error("El navegador se cerró antes de confirmar.");
+            }
+
+            // 2. Comprobación de errores generales visibles
+            // Usamos un try interno por si el elemento desaparece mientras lo leemos
+            const hayErrorVisible = await page.getByText('Error').isVisible().catch(() => false) || 
+                                    await page.getByText('Problema').isVisible().catch(() => false);
+
+            if (hayErrorVisible) {
+                console.log("❌ Error 'Atención' detectado en el sitio.");
+                return status.error("Error al afiliar. Revisa los datos");
+            }
+
+            // 3. Verificamos nuevamente con la función auxiliar
+            // Le pasamos un flag o hacemos el try-catch aquí mismo para que no explote
+            try {
+                 resultadoCheck = await checkAffiliate();
+                 if (resultadoCheck) return resultadoCheck;
+            } catch (err) {
+                // Si falla checkAffiliate porque la pagina se cerró, lo ignoramos o devolvemos error
+                console.log("⚠️ No se pudo verificar afiliación final (contexto cerrado): " + err.message);
+            }
+
+            // Si sobrevivió a todo lo anterior y no hay errores:
+            return status.ok("https://pba.sportsbet.bet.ar/");
+
+        } catch (error) {
+            // Este catch captura si el navegador se cierra EN MEDIO de las verificaciones de arriba
+            if (error.message.includes('Target page, context or browser has been closed')) {
+                console.log("⚠️ Error crítico: El navegador murió durante la verificación final.");
+                return status.error("Conexión perdida con el navegador.");
+            }
+            throw error; // Si es otro error, que lo maneje el catch principal
         }
-
-        checkAffiliate();
-
-        // Ajusta esta lógica según la URL de éxito real
-        if (await page.getByText("Ya existe")) {
-            console.log(status.previamenteAfiliado)
-            return status.previamenteAfiliado
-        }
-
-        return status.ok("https://pba.sportsbet.bet.ar/");
+        // --- FIN DE BLOQUE PROTEGIDO ---
 
     } catch (error) {
         console.log('❌ Error General: ', error);
         return status.error(error.message);
     }
 }
-
-module.exports = sportsbetPba
+module.exports = sportsbetPba;
