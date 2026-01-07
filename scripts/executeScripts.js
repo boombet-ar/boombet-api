@@ -1,20 +1,57 @@
 const { chromium } = require('playwright');
+const { status } = require('../utils'); // Importamos status desde utils
 const playwrightHeadless = process.env.PLAYWRIGHT_HEADLESS
 require('dotenv').config({ quiet: true });
 
+// Función auxiliar para manejar los reintentos
+const runWithRetry = async (scriptFunc, context, playerData, maxRetries) => {
+    let attempt = 0;
+    let result;
 
+    while (attempt <= maxRetries) {
+        let page = null;
+        try {
+            // CREAMOS UNA PESTAÑA NUEVA PARA ESTE INTENTO
+            page = await context.newPage();
 
-//CONCURRENCIA: Usar child_process, send() ,on(), fork() etc
+            // Ejecutamos el script pasándole la página nueva
+            result = await scriptFunc(page, playerData);
 
+            if (result && result.success) {
+                // Opcional: Cerrar la página si terminó bien
+                // await page.close(); 
+                return result;
+            }
 
+            console.log(`⚠️ Intento ${attempt + 1} fallido.`);
+            // Si falló por lógica, cerramos la página
+            await page.close().catch(() => {}); 
 
-//executescripts deberia ser el proceso forkeado. el controller deberia ser el padre
+        } catch (error) {
+            console.error(`❌ Error (crash) en intento ${attempt + 1}:`, error);
+            
+            // Aseguramos limpieza
+            if (page) await page.close().catch(() => {});
+            
+            // USAMOS EL HELPER DE UTILS EN LUGAR DE HARDCODEAR
+            result = status.error(error.message); 
+        }
 
+        attempt++;
+        
+        if (attempt <= maxRetries) {
+            console.log(`🔄 Reintentando... (${attempt}/${maxRetries})`);
+            await new Promise(res => setTimeout(res, 1000));
+        }
+    }
 
-const executeScripts = async (scripts, playerData) => { // array con rutas de scripts de una provincia y playerData
+    return result;
+};
+
+const executeScripts = async (scripts, playerData) => { 
 
     const browser = await chromium.launch({
-        headless: playwrightHeadless === 'false' ? false : true, // Cambia a false si querés ver el navegador. En n8n, dejar en true
+        headless: playwrightHeadless === 'false' ? false : true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
@@ -29,19 +66,10 @@ const executeScripts = async (scripts, playerData) => { // array con rutas de sc
         userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36',
     });
 
-
-
-    const pages = await Promise.all(     //Crear una pestaña para cada script
-        scripts.map(() => context.newPage())
-    );
-
-
     try {
-
         const results = await Promise.all(
-            scripts.map((scriptFunc, i) => scriptFunc(pages[i], playerData))
+            scripts.map((scriptFunc) => runWithRetry(scriptFunc, context, playerData, 2))
         );
-
 
         const resultados = Object.fromEntries(
             scripts.map((f, i) => [f.name || `script${i + 1}`, results[i]])
@@ -49,10 +77,8 @@ const executeScripts = async (scripts, playerData) => { // array con rutas de sc
 
         return resultados;
 
-
     } catch (error) {
-        console.error('Error al ejecutar scripts:', error);
-        return error;
+        return error
     } finally {
         await browser.close();
     }
@@ -64,7 +90,6 @@ process.on('message', async (message) => {
     const functions = scripts.map(s => {
         return require(s)
     })
-
 
     try {
         const responses = await executeScripts(functions, playerData);
@@ -79,6 +104,5 @@ process.on('message', async (message) => {
         process.disconnect();
     }
 });
-
 
 module.exports = executeScripts
