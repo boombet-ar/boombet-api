@@ -114,7 +114,7 @@ register_key: <Valor definido en tu .env>
 
 #### 1. Registro Masivo (Por Provincia)
 
-Ejecuta la batería de scripts asociados a una provincia.
+Ejecuta todos los scripts asociados a una provincia.
 
 ```
 POST /register/:provincia
