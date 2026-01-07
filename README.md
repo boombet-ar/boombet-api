@@ -37,7 +37,7 @@ Nota: Esto instalará también los binarios de los navegadores de Playwright.
 
 3. **Configurar Variables de Entorno**:
 
-Crea un archivo `.env` en la raíz del proyecto (ver sección Variables de Entorno más abajo).
+Para desarrollo pueden configurarse mediante un archivo .env en la raíz del proyecto 
 
 4. **Iniciar la aplicación**:
 
@@ -51,7 +51,7 @@ npm start
 
 ## 🔑 Variables de Entorno (.env)
 
-Crea un archivo `.env` en la raíz y configura las siguientes variables:
+La app depende de las siguientes variables de entorno
 
 ### Base de Datos
 
@@ -66,7 +66,7 @@ DB_NAME=boombet_db
 ### Seguridad
 
 ```
-# Key maestra para proteger los endpoints de registro
+# Clave de afiliaciones
 REGISTER_KEY=tu_api_key_secreta
 
 # Credenciales para el panel de administración de afiliados
