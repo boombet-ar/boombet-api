@@ -6,6 +6,7 @@ const limit = require('../utils/processQueue')
 const n8nWebhookUrl = process.env.WEBHOOK_URL
 const afWebhook = process.env.AF_WEBHOOK
 const scriptsList = require('../utils/provinceLists')
+const playwrightHeadless = process.env.PLAYWRIGHT_HEADLESS
 
 const { fork } = require('node:child_process')
 
@@ -45,7 +46,7 @@ const registerCasino = async (req, res) => {
     }
 
     const browser = await chromium.launch({
-        headless: true, // Cambia a false si querés ver el navegador. En produccion, dejar en true
+        headless: playwrightHeadless === 'false' ? false : true, // Cambia a false si querés ver el navegador. En n8n, dejar en true
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
@@ -62,7 +63,8 @@ const registerCasino = async (req, res) => {
     const page = await context.newPage();
 
     try {
-        const responses = await scriptCasino(page, playerData)
+        
+        const responses = await limit(scriptCasino(page, playerData))
 
         const success = !!responses;
 

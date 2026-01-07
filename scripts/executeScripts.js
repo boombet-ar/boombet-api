@@ -1,5 +1,5 @@
 const { chromium } = require('playwright');
-
+const playwrightHeadless = process.env.PLAYWRIGHT_HEADLESS
 require('dotenv').config({ quiet: true });
 
 
@@ -14,9 +14,11 @@ require('dotenv').config({ quiet: true });
 const executeScripts = async (scripts, playerData) => { // array con rutas de scripts de una provincia y playerData
 
     const browser = await chromium.launch({
-        headless: true, // Cambia a false si querés ver el navegador. En n8n, dejar en true
+        headless: playwrightHeadless === 'false' ? false : true, // Cambia a false si querés ver el navegador. En n8n, dejar en true
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
+
+    console.log(playwrightHeadless)
 
     const context = await browser.newContext({
         proxy: {
