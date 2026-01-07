@@ -1,79 +1,82 @@
-🎰 Boombet Automation API
+# 🎰 Boombet Automation API
 
 API centralizada para la automatización de afiliaciones en casinos, gestión de eventos y administración de afiliados. Utiliza Playwright para la ejecución de scripts de navegación y PostgreSQL para la persistencia de datos.
 
-🚀 Stack Tecnológico
+## 🚀 Stack Tecnológico
 
-Runtime: Node.js
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Automation**: Playwright (Chromium)
+- **Database**: PostgreSQL
+- **Infrastructure**: Docker & Azure Container Apps
+- **CI/CD**: GitHub Actions
 
-Framework: Express.js
+## 🛠️ Instalación y Configuración Local
 
-Automation: Playwright (Chromium)
+### Prerrequisitos
 
-Database: PostgreSQL
+- Node.js v18 o superior.
+- PostgreSQL corriendo localmente o accesible remotamente.
 
-Infrastructure: Docker & Azure Container Apps
+### Pasos
 
-CI/CD: GitHub Actions
+1. **Clonar el repositorio**:
 
-🛠️ Instalación y Configuración Local
-
-Prerrequisitos
-
-Node.js v18 o superior.
-
-PostgreSQL corriendo localmente o accesible remotamente.
-
-Pasos
-
-Clonar el repositorio:
-
-git clone [https://github.com/boombet-ar/boombet-api.git](https://github.com/boombet-ar/boombet-api.git)
+```bash
+git clone https://github.com/boombet-ar/boombet-api.git
 cd boombet-api
+```
 
+2. **Instalar dependencias**:
 
-Instalar dependencias:
-
+```bash
 npm install
-
+```
 
 Nota: Esto instalará también los binarios de los navegadores de Playwright.
 
-Configurar Variables de Entorno:
-Crea un archivo .env en la raíz del proyecto (ver sección Variables de Entorno más abajo).
+3. **Configurar Variables de Entorno**:
 
-Iniciar la aplicación:
+Crea un archivo `.env` en la raíz del proyecto (ver sección Variables de Entorno más abajo).
 
+4. **Iniciar la aplicación**:
+
+```bash
 # Modo desarrollo (con nodemon)
 npm run dev
 
 # Modo producción
 npm start
+```
 
+## 🔑 Variables de Entorno (.env)
 
-🔑 Variables de Entorno (.env)
+Crea un archivo `.env` en la raíz y configura las siguientes variables:
 
-Pueden configurarse mediante un archivo .env en la raíz.
+### Base de Datos
 
-Base de Datos
-
+```
 DB_USER=tu_usuario
 DB_PASS=tu_contraseña
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=boombet_db
+```
 
-Seguridad
+### Seguridad
 
+```
 # Key maestra para proteger los endpoints de registro
 REGISTER_KEY=tu_api_key_secreta
 
 # Credenciales para el panel de administración de afiliados
 AF_ADMIN_USER=admin
 AF_ADMIN_PASS=password_segura
+```
 
-Playwright & Proxies
+### Playwright & Proxies
 
+```
 PLAYWRIGHT_HEADLESS=true  # 'false' para ver el navegador abrirse
 CAPTCHA_API_KEY=tu_key_de_2captcha
 
@@ -81,12 +84,13 @@ CAPTCHA_API_KEY=tu_key_de_2captcha
 PROXY_IPROYAL_SERVER=geo.iproyal.com:12321
 PROXY_IPROYAL_USERNAME=usuario_proxy
 PROXY_IPROYAL_PASSWORD=pass_proxy
+```
 
+### Integraciones Externas (Webhooks & URLs)
 
-Integraciones Externas (Webhooks & URLs)
-
-WEBHOOK_URL=[https://tu-n8n-o-servicio.com/webhook/general](https://tu-n8n-o-servicio.com/webhook/general)
-AF_WEBHOOK=[https://tu-n8n-o-servicio.com/webhook/afiliados](https://tu-n8n-o-servicio.com/webhook/afiliados)
+```
+WEBHOOK_URL=https://tu-n8n-o-servicio.com/webhook/general
+AF_WEBHOOK=https://tu-n8n-o-servicio.com/webhook/afiliados
 
 # URLs Base de Casinos (Target)
 BPLAY_CBA_URL=https://...
@@ -94,39 +98,51 @@ BPLAY_CABA_URL=https://...
 BPLAY_PBA_URL=https://...
 SPORTSBET_PBA_URL=https://...
 BPLAY_SFE_URL=https://...
+```
 
+## 📡 Endpoints de la API
 
-📡 Endpoints de la API
-
-🛡️ Autenticación
+### 🛡️ Autenticación
 
 Los endpoints de registro requieren el siguiente header por seguridad:
 
+```
 register_key: <Valor definido en tu .env>
+```
 
-📝 Automatización y Registro (/register)
+### 📝 Automatización y Registro (/register)
 
-1. Registro Masivo (Por Provincia)
-Ejecuta todos los scripts asociados a una provincia.
+#### 1. Registro Masivo (Por Provincia)
 
+Ejecuta la batería de scripts asociados a una provincia.
+
+```
 POST /register/:provincia
+```
 
-Params: provincia (ej: pba, caba, sfe, cba).
+**Params**: provincia (ej: pba, caba, sfe, cba).
 
-2. Registro con Token de Afiliador
+#### 2. Registro con Token de Afiliador
+
 Registra un usuario y lo asocia a un afiliador específico.
 
+```
 POST /register/:provincia/:tokenAfiliador
+```
 
-3. Ejecución Unitaria (Script Específico)
+#### 3. Ejecución Unitaria (Script Específico)
+
 Ejecuta la automatización para un solo casino.
 
+```
 POST /register/afiliar/:provincia/:nombreCasino
+```
 
-Params: nombreCasino (ej: sportsbetPba, bplayPba, bplayCaba, etc).
+**Params**: nombreCasino (ej: sportsbetPba, bplayPba, bplayCaba, etc).
 
-Cuerpo del Request (JSON):
+#### Cuerpo del Request (JSON)
 
+```json
 {
   "nombre": "Juan",
   "apellido": "Perez",
@@ -145,68 +161,81 @@ Cuerpo del Request (JSON):
   "user": "JuanP2025",
   "password": "Password123!"
 }
+```
 
+### 👥 Gestión de Afiliadores (/afiliadores)
 
-👥 Gestión de Afiliadores (/afiliadores)
-
+```
 GET /afiliadores
+```
 
-Obtiene la lista de todos los afiliadores.
+Obtiene la lista de todos los afiliados.
 
+```
 POST /afiliadores/toggleActivo/:id
+```
 
 Activa o desactiva un afiliador.
 
+```
 DELETE /afiliadores/delete/:id
+```
 
 Elimina un afiliador (Soft delete o hard delete según implementación).
 
+```
 POST /afiliadores/af_admin_login
+```
 
 Login para panel de administración.
 
-Body: { "user": "...", "password": "..." }
+**Body**: `{ "user": "...", "password": "..." }`
 
-📅 Gestión de Eventos (/eventos)
+### 📅 Gestión de Eventos (/eventos)
 
+```
 GET /eventos
+```
 
 Lista todos los eventos disponibles.
 
+```
 POST /eventos
+```
 
 Crea un nuevo evento.
 
-Body: { "nombre": "Evento Marzo", "fecha_inicio": "...", "fecha_fin": "...", "provincia_id": 1 }
+**Body**: `{ "nombre": "Evento Marzo", "fecha_inicio": "...", "fecha_fin": "...", "provincia_id": 1 }`
 
+```
 POST /eventos/afiliador/:id_afiliador
+```
 
 Asigna un afiliador a un evento específico.
 
-Body: { "id_evento": 5 }
+**Body**: `{ "id_evento": 5 }`
 
-🐳 Despliegue (Docker & Azure)
+## 🐳 Despliegue (Docker & Azure)
 
 El proyecto está dockerizado para facilitar su despliegue en la nube.
 
-Construir imagen localmente:
+### Construir imagen localmente:
 
+```bash
 docker build -t boombet-api .
+```
 
+### Ejecutar contenedor:
 
-Ejecutar contenedor:
-
+```bash
 docker run -p 3000:3000 --env-file .env boombet-api
+```
 
+## CI/CD
 
-CI/CD
+El repositorio cuenta con un workflow de GitHub Actions (`deploy-azurecontainer.yml`) que:
 
-El repositorio cuenta con un workflow de GitHub Actions (deploy-azurecontainer.yml) que:
-
-Detecta cambios en la rama main.
-
-Construye la imagen Docker.
-
-La sube a Azure Container Registry (ACR).
-
-Despliega la nueva versión en Azure Container Apps.
+- Detecta cambios en la rama main.
+- Construye la imagen Docker.
+- La sube a Azure Container Registry (ACR).
+- Despliega la nueva versión en Azure Container Apps.
